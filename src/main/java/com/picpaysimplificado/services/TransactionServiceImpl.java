@@ -16,6 +16,7 @@ import com.picpaysimplificado.domain.user.User;
 import com.picpaysimplificado.dto.AuthorizationDto;
 import com.picpaysimplificado.dto.TransactionDto;
 import com.picpaysimplificado.repositories.TransactionRepository;
+import com.picpaysimplificado.services.contracts.NotificationService;
 import com.picpaysimplificado.services.contracts.TransactionService;
 import com.picpaysimplificado.services.contracts.UserService;
 import com.picpaysimplificado.util.TransactionFactory;
@@ -31,16 +32,19 @@ public class TransactionServiceImpl implements TransactionService {
 
     private final RestTemplate restTemplate;
 
+    private final NotificationService notificationService;
+
     @Value("${authorization.service.url}")
     private String authorizationUrl;
 
     
-    @Autowired
-    public TransactionServiceImpl(UserService userService, TransactionRepository repository,
-            RestTemplate restTemplate) {
+
+    public TransactionServiceImpl(UserService userService, TransactionRepository repository, RestTemplate restTemplate,
+            NotificationService notificationService) {
         this.userService = userService;
         this.repository = repository;
         this.restTemplate = restTemplate;
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -65,6 +69,9 @@ public class TransactionServiceImpl implements TransactionService {
         repository.save(newTransaction);
         userService.update(UserMapper.convertToDto(sender));
         userService.update(UserMapper.convertToDto(receiver));
+
+        notificationService.sendNotification(sender, "Transação efetuada com sucesso!");
+        notificationService.sendNotification(receiver, "Uma transação foi efetuada para você!");
 
         return TransactionMapper.convertToDto(newTransaction);
     }
