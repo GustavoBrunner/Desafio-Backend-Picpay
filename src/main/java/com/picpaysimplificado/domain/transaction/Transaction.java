@@ -24,6 +24,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 public class Transaction {
+    public Transaction(User sender, User receiver, BigDecimal amount, LocalDateTime transactionHour){
+        this.sender = sender;
+        this.receiver = receiver;
+        this.amount = amount;
+        this.transactionHour = transactionHour;
+    }
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -39,5 +45,6 @@ public class Transaction {
 
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime transactionHour;
+
 
 }
